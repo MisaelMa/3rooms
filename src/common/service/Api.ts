@@ -1,6 +1,6 @@
 import axios, {AxiosInstance} from 'axios'
 
-const API_NEST_URL =  `http://localhost:3000/`
+const API_NEST_URL =  process.env.NODE_ENV === 'production' ?  `https://rem.signati.app/` : `http://localhost:3000/`;
 class ApiCnx {
 
     api: string = ''
