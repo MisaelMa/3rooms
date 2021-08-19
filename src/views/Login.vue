@@ -5,16 +5,17 @@
 
         <v-row align="center"
                justify="center">
-          <v-col cols="12" sm="10">
+          <v-col cols="12" sm="8">
             <img alt="tu colegio"
                  width="240"
                  height="50"
+                 style="margin-left: -43px"
                  src="../assets/login.svg">
-            <div>
+            <h2>
               Inicia sesión
-            </div>
+            </h2>
           </v-col>
-          <v-col cols="12" sm="10">
+          <v-col cols="12" sm="8">
             <v-form
                 ref="form"
                 v-model="valid"
@@ -22,10 +23,10 @@
             >
               <label>Usuario</label>
               <v-text-field
-                  v-model="name"
+                  v-model="email"
                   outlined
                   dense
-                  :rules="nameRules"
+                  :rules="emailRules"
                   required
               ></v-text-field>
 
@@ -35,35 +36,19 @@
                 <v-icon @click="view=!view">{{ !view ? mdiEye : mdiEyeOff }}</v-icon>
               </div>
               <v-text-field
-                  v-model="email"
-                  :rules="emailRules"
+                  v-model="password"
+                  :rules="nameRules"
+                  :type="!view ? 'password' : 'text'"
                   outlined
                   dense
                   required
               ></v-text-field>
-
               <v-btn
-                  :disabled="!valid"
-                  color="success"
-                  class="mr-4"
+                  block
+                  color="warning"
                   @click="validate"
               >
-                Validate
-              </v-btn>
-
-              <v-btn
-                  color="error"
-                  class="mr-4"
-                  @click="reset"
-              >
-                Reset Form
-              </v-btn>
-
-              <v-btn
-                  color="warning"
-                  @click="resetValidation"
-              >
-                Reset Validation
+                Iniciar sesión
               </v-btn>
             </v-form>
           </v-col>
@@ -87,21 +72,22 @@
 import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue';
 import {defineComponent, ref} from "@vue/composition-api";
-import {mdiEye, mdiEyeOff} from "@mdi/js"; // @ is an alias to /src
+import {mdiEye, mdiEyeOff} from "@mdi/js";
+import {useAuthStore} from "@/common/Hooks/useAuthStore";
+import {authService} from "@/common/service/auth.services"; // @ is an alias to /src
 
 export default defineComponent({
   name: 'Home',
   components: {
     HelloWorld,
   },
-  setup() {
+  setup(props,{root}) {
 
     const valid = ref(true)
     const view = ref(false)
-    const name = ref('')
+    const password = ref('')
     const nameRules = [
-      (v: any) => !!v || 'Name is required',
-      (v: any) => (v && v.length <= 10) || 'Name must be less than 10 characters',
+      (v: any) => !!v || 'Password is required',
     ]
 
     const email = ref('')
@@ -110,9 +96,20 @@ export default defineComponent({
       (v: any) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
     ]
     const form = ref<any>(null)
+    const { isAuthenticated, setAuth } = useAuthStore()
+    const validate = async () => {
+      if (form.value.validate()) {
+        try {
+          const data = await authService.login({
+            email: email.value,
+            password: password.value
+          })
+          setAuth(data.data)
+          root.$router.push('/');
+        } catch (e) {
 
-    const validate = () => {
-      form.value.validate()
+        }
+      }
     }
     const reset = () => {
       form.value.reset()
@@ -123,7 +120,7 @@ export default defineComponent({
 
     return {
       valid,
-      name,
+      password,
       nameRules,
       emailRules,
       email,

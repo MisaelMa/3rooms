@@ -7,6 +7,7 @@
       <img alt="tu colegio"
            width="240"
            height="50"
+           @click="logoutUser"
            src="../../assets/logo.svg">
     </div>
     <v-list-item>
@@ -15,7 +16,7 @@
           Hola
         </v-list-item-subtitle>
         <v-list-item-title class="text-h6">
-          Israel Domínguez
+          {{ user.name }}
         </v-list-item-title>
       </v-list-item-content>
     </v-list-item>
@@ -29,7 +30,7 @@
           active-class="blanco"
       >
         <v-list-item
-            v-for="item in items"
+            v-for="item in filterRuta"
             :key="item.title"
             link
             :to="item.path"
@@ -52,28 +53,61 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from "@vue/composition-api";
+import {computed, defineComponent, onMounted, ref} from "@vue/composition-api";
 import {
   mdiClipboardCheck,
   mdiAccountCheck,
   mdiCog,
 } from '@mdi/js'
+import {useAuthStore} from "@/common/Hooks/useAuthStore";
 
 export default defineComponent({
   name: "Menu",
-  setup() {
+  setup(props,{root}) {
     const selected = ref(0);
     const items = ref([
-      {title: 'Reportes', icon: mdiClipboardCheck, path: '/reportes'},
-      {title: 'Usuarios', icon: mdiAccountCheck, path: '/usuarios'},
-      {title: 'Configuración', icon: mdiCog, path: '/configuracion'},
+      {
+        title: 'Reportes',
+        icon: mdiClipboardCheck,
+        path: '/reportes',
+        permisos: ['admin', 'guest']
+      },
+      {
+        title: 'Usuarios',
+        icon: mdiAccountCheck,
+        path: '/usuarios',
+        permisos: ['admin']
+      },
+      {
+        title: 'Configuración',
+        icon: mdiCog,
+        path: '/configuracion',
+        permisos: ['admin', 'guest']
+      },
     ])
+    const {user, getRol, logout} = useAuthStore()
+    const filterRuta = computed(()=>{
+      const rutas = []
+      for (const item of items.value){
+        console.log(item.permisos.includes(getRol.value))
+        if (item.permisos.includes(getRol.value)){
+          rutas.push(item)
+        }
+      }
+      return rutas
+    })
+    const logoutUser = ()=> {
+      logout()
+      root.$router.push('/login');
+    }
     const drawer = ref(true)
-
     return {
       items,
       drawer,
-      selected
+      selected,
+      user,
+      filterRuta,
+      logoutUser
     }
   }
 })

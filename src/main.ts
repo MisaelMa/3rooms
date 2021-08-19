@@ -5,7 +5,7 @@ import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
 import VueCompositionAPI from '@vue/composition-api'
-
+import './plugins/filters';
 Vue.use(VueCompositionAPI)
 Vue.config.productionTip = false
 
