@@ -76,7 +76,7 @@
             <v-col cols="6">
               <label>Correo</label>
               <v-text-field v-model="newUser.email"
-                            :rules="rules"
+                            :rules="emailRules"
                             outlined dense/>
             </v-col>
             <v-col cols="6">
@@ -153,6 +153,10 @@ export default defineComponent({
       (v: any) => !!v || 'Is required',
     ]
 
+    const emailRules = [
+      (v: any) => !!v || 'E-mail is required',
+      (v: any) => /.+@.+\..+/.test(v) || 'E-mail must be valid',
+    ]
     const getUsers = async () => {
       try {
         const data = await userServices.getUsers()
@@ -225,7 +229,8 @@ export default defineComponent({
       snackbar,
       text,
       timeout,
-      eliminar
+      eliminar,
+      emailRules
     }
   }
 });
