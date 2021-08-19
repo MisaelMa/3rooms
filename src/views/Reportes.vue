@@ -2,7 +2,7 @@
   <v-container class="pa-10">
     <v-row >
       <v-col cols="12" >
-        <h1 style="text-align: center" class="">Reportes {{select}}</h1>
+        <h1 style="text-align: center" class="">Reportes </h1>
         <v-expansion-panels v-model="select" accordion class="elevation-0">
           <v-expansion-panel disabled>
             <v-expansion-panel-header style="border-bottom: 0px">
